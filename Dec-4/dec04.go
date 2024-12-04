@@ -8,7 +8,7 @@ import (
 
 func main() {
 	// Path to your text file
-	filePath := "input2.txt"
+	filePath := "input.txt"
 
 	grid, err := ReadFileTo2DArray(filePath)
 	if err != nil {
@@ -21,9 +21,9 @@ func main() {
 		fmt.Println(string(row))
 	}
 
-	part := 2
+	part := 1
 	// Find and print X -> M -> A patterns
-	FindConnections(grid)
+	FindConnections(grid, part)
 
 }
 
@@ -48,7 +48,7 @@ func ReadFileTo2DArray(filePath string) ([][]rune, error) {
 	return grid, nil
 }
 
-func FindConnections(grid [][]rune) {
+func FindConnections(grid [][]rune, part int) {
 
 	xmasCount := 0
 
@@ -57,33 +57,75 @@ func FindConnections(grid [][]rune) {
 		{0, -1}, {0, 1}, // Left,       Right
 		{1, -1}, {1, 0}, {1, 1}, // Bottom-left, Bottom, Bottom-right
 	}
-	corners := [][2]int{
-		{-1, -1}, {-1, 1}, {1, -1}, {1, 1},
-	}
 
 	for row, rows := range grid {
 		for col, char := range rows {
-			if char == 'A' {
-				for _, dir := range directions {
-					fmt.Println(dir)
-					dirRow, dirCol := dir[0], dir[1]
-					if CheckForConnection(grid, row, col, dirRow, dirCol) {
-						fmt.Printf("Pattern found at [%d][%d] in direction (%d, %d)\n", row, col, dirRow, dirCol)
+			if part == 2 {
+				if char == 'A' {
+					if CheckCorners(grid, row, col) {
 						xmasCount++
-						fmt.Println(xmasCount)
+						fmt.Printf("Current xmas count is: %d\n", xmasCount)
+					}
+				}
+			} else {
+				if char == 'X' {
+					for _, dir := range directions {
+						dirRow, dirCol := dir[0], dir[1]
+						if CheckForConnection(grid, row, col, dirRow, dirCol) {
+							xmasCount++
+							fmt.Println(xmasCount)
+						}
 					}
 				}
 			}
+
 		}
 	}
 
 }
 
-func CheckCorners(grid [][]rune, row, col int, dirRow, dirCol int) bool {
-	newRow, newCol := row+dirRow, col+dirCol
-	if newRow < 0 || newRow >= len(grid) || newCol < 0 || newCol >= len(grid[newRow]) || grid[newRow][newCol] != 'M' {
+func CheckCorners(grid [][]rune, row, col int) bool {
+	// Define the corner pairs: top-right to bottom-left, top-left to bottom-right
+	topRight := [2]int{-1, 1}
+	bottomLeft := [2]int{1, -1}
+	topLeft := [2]int{-1, -1}
+	bottomRight := [2]int{1, 1}
+
+	topRightRow, topRightCol := row+topRight[0], col+topRight[1]
+	bottomLeftRow, bottomLeftCol := row+bottomLeft[0], col+bottomLeft[1]
+
+	if topRightRow >= 0 && topRightRow < len(grid) && topRightCol >= 0 && topRightCol < len(grid[topRightRow]) &&
+		bottomLeftRow >= 0 && bottomLeftRow < len(grid) && bottomLeftCol >= 0 && bottomLeftCol < len(grid[bottomLeftRow]) {
+		topRightChar := grid[topRightRow][topRightCol]
+		bottomLeftChar := grid[bottomLeftRow][bottomLeftCol]
+
+		// Check if the first pair matches the condition
+		if !((topRightChar == 'M' && bottomLeftChar == 'S') || (topRightChar == 'S' && bottomLeftChar == 'M')) {
+			return false
+		}
+	} else {
+		// Out of bounds for top-right or bottom-left
 		return false
 	}
+
+	// Check top-left to bottom-right
+	topLeftRow, topLeftCol := row+topLeft[0], col+topLeft[1]
+	bottomRightRow, bottomRightCol := row+bottomRight[0], col+bottomRight[1]
+
+	if topLeftRow >= 0 && topLeftRow < len(grid) && topLeftCol >= 0 && topLeftCol < len(grid[topLeftRow]) &&
+		bottomRightRow >= 0 && bottomRightRow < len(grid) && bottomRightCol >= 0 && bottomRightCol < len(grid[bottomRightRow]) {
+		topLeftChar := grid[topLeftRow][topLeftCol]
+		bottomRightChar := grid[bottomRightRow][bottomRightCol]
+
+		// Check if the second pair matches the condition
+		if !((topLeftChar == 'M' && bottomRightChar == 'S') || (topLeftChar == 'S' && bottomRightChar == 'M')) {
+			return false
+		}
+	} else {
+		// Out of bounds for top-left or bottom-right
+		return false
+	}
+
 	return true
 }
 

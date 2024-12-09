@@ -1,4 +1,4 @@
-package main
+
 
 import (
 	"bufio"
@@ -39,6 +39,7 @@ func main() {
 	fmt.Println(startPosition)
 	fmt.Println(grid[startPosition.X][startPosition.Y])
 	fmt.Println(checkDirections(grid, startPosition))
+
 }
 
 func checkDirections(grid [][]rune, start Point) int {
@@ -57,6 +58,8 @@ func checkDirections(grid [][]rune, start Point) int {
 
 	prevRow, prevCol := newRow, newCol
 	visitedSquares := make(map[Point]bool)
+
+	visitedSquares[Point{X: newRow, Y: newCol}] = true
 
 	fmt.Printf("New row: %d, new col: %d\n", newRow, newCol)
 
@@ -97,6 +100,7 @@ func checkDirections(grid [][]rune, start Point) int {
 
 			}
 		} else {
+
 			break
 		}
 

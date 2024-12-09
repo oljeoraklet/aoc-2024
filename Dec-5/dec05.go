@@ -46,9 +46,17 @@ func main() {
 
 	for _, sequence := range sequences {
 		if validSequence(sequence, rules) {
-			middleIndex := len(sequence) / 2
-			middleTotal += sequence[middleIndex]
+			// middleIndex := len(sequence) / 2
+			// middleTotal += sequence[middleIndex]
+			// fmt.Printf("Middle total is %d\n", middleTotal)
+		} else {
+			// fmt.Println("Sequence: ", sequence)
+			correctedSequence := reorderSequence(sequence, rules)
+			// fmt.Println("Corrected sequence: ", correctedSequence)
+			middleIndex := len(correctedSequence) / 2
+			middleTotal += correctedSequence[middleIndex]
 			fmt.Printf("Middle total is %d\n", middleTotal)
+
 		}
 	}
 
@@ -76,4 +84,41 @@ func validSequence(sequence []int, rules map[int][]int) bool {
 	}
 
 	return true
+}
+
+func reorderSequence(sequence []int, rules map[int][]int) []int {
+	// Create a reordered slice
+	reordered := []int{}
+	seen := make(map[int]bool)
+
+	// Helper function to add a number and its dependencies
+	var addNumber func(int)
+	addNumber = func(num int) {
+		if seen[num] {
+			return
+		}
+		for _, dep := range rules[num] {
+			if contains(sequence, dep) {
+				addNumber(dep)
+			}
+		}
+		reordered = append(reordered, num)
+		seen[num] = true
+	}
+
+	// Process each number in the sequence
+	for _, num := range sequence {
+		addNumber(num)
+	}
+
+	return reordered
+}
+
+func contains(slice []int, num int) bool {
+	for _, v := range slice {
+		if v == num {
+			return true
+		}
+	}
+	return false
 }

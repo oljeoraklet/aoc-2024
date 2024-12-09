@@ -13,7 +13,7 @@ type Point struct {
 
 func main() {
 	// Path to your text file
-	filePath := "input.txt"
+	filePath := "test.txt"
 
 	grid, err := ReadFileTo2DArray(filePath)
 	if err != nil {
@@ -71,7 +71,7 @@ func getAntiNodes(antennas map[rune][]Point) map[Point]bool {
 
 				var distanceDown Point = Point{point2.X - point1.X, point2.Y - point1.Y}
 
-				//Add double the distance to both points in either direction
+				//Add the distance to both points in either direction
 				var antiPoint1 Point = Point{point1.X + distanceUp.X, point1.Y + distanceUp.Y}
 
 				fmt.Printf("AntiPoint 1: %v\n", antiPoint1)
